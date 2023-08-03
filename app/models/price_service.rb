@@ -1,6 +1,11 @@
 class PriceService
   def self.fetch_prices(ticker)
-    stocks_found = client.search(keywords: ticker)
+    date_and_close_pairs = client
+      .stock(symbol: ticker)
+      .timeseries(adjusted: true, outputsize: 'full')
+      .output["Time Series (Daily)"]
+      .map {|k, v| [k, v["5.  adjusted close"]]}
+    Hash[date_and_close_pairs]
   end
 
   def self.client
